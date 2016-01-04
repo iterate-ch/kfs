@@ -35,7 +35,9 @@ struct kfscontents {
 	uint64_t count;
 };
 
-/*!
+const kfsfilesystem_t *get_filesystem_from_handle(const char *handle, const char **path, uint64_t *identifier);
+
+    /*!
  \brief		Puts a filesystem
  \details	Puts a filesystem in the table. Returns the identifier
 			used for the filesystem.
@@ -50,22 +52,9 @@ void kfstable_remove(kfsid_t identifier);
 
 /*!
  \brief		Get a filesystem
- \details	Gets a filesystem from the table. It is guarenteed to have
-			each of the filesystem functions set.
+ \details	Gets a filesystem from the table.
  */
 const kfsfilesystem_t *kfstable_get(kfsid_t identifier);
-
-/*!
- \brief		Iterates identifiers
- \details	Start by passing in a pointer to an identifier (initialized to 0).
-			Continue to pass the same pointer, and this will iterate the
-			identifiers in the table. While there are still entries in the table
-			this will continue to iterate, so if you only want to iterate once,
-			you'll need to check for when you get back the same identifier twice.
-			This will return true if an identifier was returned, and false if
-			there were no more identifiers in the table.
- */
-bool kfstable_iterate(kfsid_t *identifier);
 
 #define READ_MAX_LEN	0x10000		/* 64K */
 #define WRITE_MAX_LEN	0x10000		/* 64K */

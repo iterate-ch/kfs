@@ -92,6 +92,12 @@ typedef enum {
  @{
  */// ----------------------------------------------------------------------------------------------------
 
+typedef uint32_t (*kfsidentifier_f)();
+
+typedef uint32_t (*kfsfileid_f)(const char *path);
+
+typedef char* (*kfsfileidreverse_f)(uint32_t fileid);
+
 /*!
  \brief		Stat a filesystem
  \details	Get statistics from the filesystem located at path. Set all attributes you
@@ -119,6 +125,12 @@ typedef ssize_t (*kfsread_f)(const char *path, char *buf, size_t offset, size_t 
 			is guarenteed to be large enough to hold length bytes. Return -1 on error.
  */
 typedef ssize_t (*kfswrite_f)(const char *path, const char *buf, size_t offset, size_t length, int *error, void *context);
+
+/*!
+ \brief     Commit file
+ \details	Commit cached data on a server to stable storage
+ */
+typedef bool (*kfscommit_f)(const char *path, size_t offset, size_t count, int *error, void *context);
 
 /*!
  \brief		Create a symbolic link
@@ -188,29 +200,33 @@ typedef bool (*kfsrmdir_f)(const char *path, int *error, void *context);
  \details	Get the contents of the directory at path. Add file entries to the contents by calling
 			kfscontents_append. Values are copied so you do not need to keep them in memory.
  */
-typedef bool (*kfsreaddir_f)(const char *path, kfscontents_t *contents, int *error, void *context);
+typedef bool (*kfsreaddir_f)(const char *path, uint64_t index, uint64_t max_length, kfscontents_t *contents, int *error, void *context);
 
 /*!
- \brief		
- \details	
+ \brief
+ \details
  */
 struct kfsoptions {
 	const char *mountpoint;
 };
 
 /*!
- \brief		
- \details	
+ \brief
+ \details
 			Currently unsupported filesystem features:
 				- No support for users/groups on files
 				- No support for creating special file types
 				- No support for hard links
  */
 struct kfsfilesystem {
+    kfsidentifier_f identifier;
+    kfsfileid_f fileid;
+    kfsfileidreverse_f fileidreverse;
 	kfsstatfs_f statfs;
 	kfsstat_f stat;
 	kfsread_f read;
 	kfswrite_f write;
+    kfscommit_f commit;
 	kfssymlink_f symlink;
 	kfsreadlink_f readlink;
 	kfscreate_f create;
@@ -226,6 +242,16 @@ struct kfsfilesystem {
 	void *context;
 };
 
+/*
+ * \return port number of running NFS server
+ */
+int kfs_register_nfs_server(void);
+
+// Callback function for status
+typedef int (*kfs_signal)(void);
+
+void kfs_run_nfs_server(kfs_signal* status(void));
+
 /*!
  \brief		Mout a filesystem
  \details	Mounts a filesystem and returns an identifier that you will need in order to unmount it.
@@ -235,13 +261,13 @@ struct kfsfilesystem {
 			used by the kfs library. This mount command will create the directory at the mountpoint
 			if needed (but will not create intermediate directories).
  */
-kfsid_t kfs_mount(const kfsfilesystem_t *filesystem);
+int kfs_mount(kfsfilesystem_t *filesystem, in_port_t nfs_port);
 
 /*!
  \brief		Unmount a filesystem
  \details	Give the identifier you received when mounting the filesystem.
  */
-void kfs_unmount(kfsid_t identifier);
+int kfs_unmount(kfsfilesystem_t *filesystem);
 
 /*!
  \brief		KFS device name prefix
@@ -260,11 +286,12 @@ extern const char *kfs_devprefix;
  */// ----------------------------------------------------------------------------------------------------
 
 struct kfstime {
-	uint64_t sec;
-	uint64_t nsec;
+	uint32_t sec;
+	uint32_t nsec;
 };
 
 struct kfsstat {
+    uint32_t fileid;
 	kfstype_t type;
 	kfsmode_t mode;
 	uint64_t size;
@@ -311,21 +338,6 @@ uint64_t kfscontents_count(kfscontents_t *contents);
 			index is out of range.
  */
 const char *kfscontents_at(kfscontents_t *contents, uint64_t index);
-
-/*!@}*/
-
-
-/*!
- \name		Threading helper functionality
- \details	The following methods allow you to add callback methods for when the kfs library uses threads.
-			You should call these before doing anything else with the kfs library.
- @{
- */// ----------------------------------------------------------------------------------------------------
-
-void kfs_set_thread_begin_callback(void (*)(void));
-void kfs_set_thread_end_callback(void (*)(void));
-
-/*!@}*/
 
 
 /*!
