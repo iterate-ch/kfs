@@ -35,20 +35,33 @@
 // used on a lot of bsd systems, so it should be
 // fine to use this.
 
-#define	NFSMNT_SOFT			0x00000001  /* soft mount (hard is default) */
-#define	NFSMNT_NFSV3		0x00000200  /* Use NFS Version 3 protocol */
+#define	NFSMNT_SOFT		0x00000001  /* soft mount (hard is default) */
 #define	NFSMNT_WSIZE		0x00000002  /* set write size */
 #define	NFSMNT_RSIZE		0x00000004  /* set read size */
-#define	NFSMNT_READDIRSIZE	0x00020000  /* Set readdir size */
 #define	NFSMNT_TIMEO		0x00000008  /* set initial timeout */
 #define	NFSMNT_RETRANS		0x00000010  /* set number of request retries */
-#define	NFSMNT_INT			0x00000040  /* allow interrupts on hard mount */
+#define	NFSMNT_MAXGRPS		0x00000020  /* set maximum grouplist size */
+#define	NFSMNT_INT		0x00000040  /* allow interrupts on hard mount */
+#define	NFSMNT_NOCONN		0x00000080  /* Don't Connect the socket */
+#define	NFSMNT_NONEGNAMECACHE	0x00000100  /* Don't do negative name caching */
+#define	NFSMNT_NFSV3		0x00000200  /* Use NFS Version 3 protocol */
+#define	NFSMNT_NFSV4		0x00000400  /* Use NFS Version 4 protocol */
+#define	NFSMNT_DUMBTIMR		0x00000800  /* Don't estimate rtt dynamically */
 #define	NFSMNT_DEADTIMEOUT	0x00001000  /* unmount after a period of unresponsiveness */
+#define	NFSMNT_READAHEAD	0x00002000  /* set read ahead */
 #define	NFSMNT_CALLUMNT		0x00004000  /* call MOUNTPROC_UMNT on unmount */
+#define	NFSMNT_RESVPORT		0x00008000  /* Allocate a reserved port */
+#define	NFSMNT_RDIRPLUS		0x00010000  /* Use Readdirplus for V3 */
+#define	NFSMNT_READDIRSIZE	0x00020000  /* Set readdir size */
 #define	NFSMNT_NOLOCKS		0x00040000  /* don't support file locking */
 #define	NFSMNT_LOCALLOCKS	0x00080000  /* do file locking locally on client */
+#define	NFSMNT_ACREGMIN		0x00100000  /* reg min attr cache timeout */
+#define	NFSMNT_ACREGMAX		0x00200000  /* reg max attr cache timeout */
+#define	NFSMNT_ACDIRMIN		0x00400000  /* dir min attr cache timeout */
+#define	NFSMNT_ACDIRMAX		0x00800000  /* dir max attr cache timeout */
 #define	NFSMNT_SECFLAVOR	0x01000000  /* Use security flavor */
 #define	NFSMNT_SECSYSOK		0x02000000  /* Server can support auth sys */
+#define	NFSMNT_MUTEJUKEBOX	0x04000000  /* don't treat jukebox errors as unresponsive */
 #define	NFSMNT_NOQUOTA		0x08000000  /* don't support QUOTA requests */
 
 struct nfs_args3 {
